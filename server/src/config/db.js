@@ -8,13 +8,12 @@ const connectDB = async () => {
 
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI, {
-      // Add recommended options as needed
-      // useNewUrlParser: true, useUnifiedTopology: true
+      // Add options here if needed
     });
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error("MongoDB connection error:", error.message);
-    // Don't exit the process here to allow the server to start for local dev
+    console.error("MongoDB connection failed:", error.message || error);
+    // Do not exit the process in development — caller can decide how to handle it
   }
 };
 

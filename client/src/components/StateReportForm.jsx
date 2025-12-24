@@ -24,8 +24,15 @@ export default function StateReportForm() {
     },
   });
 
-  const onSubmit = (data) => {
-    console.log("SUBMITTED DATA", data);
+  const onSubmit = async (data) => {
+    const response = await fetch("http://localhost:5000/api/reports", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    alert(result.message);
   };
 
   return (
