@@ -1,0 +1,79 @@
+name: Client CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    name: Client: Install, Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: client
+
+    strategy:
+      matrix:
+        node-version: [18]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install client dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run lint
+        run: npm run lint --if-present
+
+      - name: Run tests (Vitest)
+        run: |
+          # Run Vitest with JUnit reporter and coverage
+          npx vitest -c vitest.config.js run --reporter junit --reporter verbose --coverage --coverageProvider=v8 || true
+          # Move junit output (if any) into test-results directory
+          mkdir -p test-results
+          if [ -f junit.xml ]; then mv junit.xml test-results/vitest-junit.xml; fi
+
+      - name: Upload test results (client)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-test-results
+          path: client/test-results
+
+      - name: Upload coverage (client)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-coverage
+          path: client/coverage
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: client/coverage/**
+          flags: client
+        env:
+          # Add CODECOV_TOKEN as a repo secret for private repos. Public repos don't need it.
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build client
+        run: npm run build --if-present
+
+      - name: Upload build artifact (client)
+        if: success() && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: client/dist

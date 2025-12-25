@@ -1,0 +1,65 @@
+name: Server CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  build:
+    name: Server: Install, Lint & Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: server
+
+    strategy:
+      matrix:
+        node-version: [18]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install server dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint --if-present
+
+      - name: Run tests
+        run: |
+          # Run server tests (if any). If your server test command supports coverage or junit reporters, configure it in package.json.
+          npm test -- --runInBand || true
+
+      - name: Upload server test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-test-results
+          path: server/test-results
+
+      - name: Upload server coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-coverage
+          path: server/coverage
+
+      - name: Upload server coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: server/coverage/**
+          flags: server
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

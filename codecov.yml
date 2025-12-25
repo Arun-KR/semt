@@ -1,0 +1,17 @@
+# Codecov configuration
+# This file can be customized to set coverage thresholds per job/flag
+parsers:
+  gcov:
+    branch_detection: yes
+
+coverage:
+  status:
+    project:
+      default:
+        target: 0% # adjust if you want to enforce a minimum; set higher to fail PRs
+    patch:
+      default:
+        target: 0%
+
+comment:
+  layout: "reach, diff"
