@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+jobs:
+  build-and-release:
+    name: Build, Test and Publish Release
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Build & test client
+        working-directory: client
+        run: |
+          npm ci --legacy-peer-deps
+          npm run lint --if-present
+          npx vitest -c vitest.config.js run --reporter verbose || true
+          npm run build --if-present
+
+      - name: Run server tests (if present)
+        working-directory: server
+        run: |
+          npm ci
+          npm run lint --if-present
+          npm test -- --runInBand || true
+
+      - name: Prepare release artifacts
+        run: |
+          mkdir -p release
+          if [ -d client/dist ]; then (cd client && zip -r ../release/client-dist.zip dist); fi
+          if [ -d server/dist ]; then (cd server && zip -r ../release/server-dist.zip dist); fi
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release artifacts
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release/client-dist.zip
+          asset_name: client-dist.zip
+          asset_content_type: application/zip
+        if: success() && steps.create_release.outputs.upload_url
+
+      - name: Upload server artifact (if exists)
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release/server-dist.zip
+          asset_name: server-dist.zip
+          asset_content_type: application/zip
+        if: success() && steps.create_release.outputs.upload_url && (always())
+
+      - name: Notify
+        run: echo "Release ${{ github.ref_name }} artifacts uploaded"

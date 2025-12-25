@@ -1,5 +1,12 @@
-import { Container, Button, Stack, Typography } from "@mui/material";
+import {
+  Container,
+  Button,
+  Stack,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
+import useApiWithSnackbar from "../hooks/useApiWithSnackbar";
 
 import StateHeaderForm from "./StateHeaderForm";
 import SemtTeamForm from "./SemtTeamForm";
@@ -9,7 +16,13 @@ import MajorActivitiesForm from "./MajorActivitiesForm";
 import ProposedActivitiesForm from "./ProposedActivitiesForm";
 
 export default function StateReportForm() {
-  const { register, control, handleSubmit } = useForm({
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       semtTeam: [],
       ongoingProjects: [],
@@ -24,15 +37,15 @@ export default function StateReportForm() {
     },
   });
 
-  const onSubmit = async (data) => {
-    const response = await fetch("http://localhost:5000/api/reports", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+  const { loading, post } = useApiWithSnackbar();
 
-    const result = await response.json();
-    alert(result.message);
+  const onSubmit = async (data) => {
+    try {
+      await post("/reports", data, { autoSuccess: true });
+      reset();
+    } catch (error) {
+      console.error("Submit failed:", error);
+    }
   };
 
   return (
@@ -43,15 +56,26 @@ export default function StateReportForm() {
 
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={3}>
-          <StateHeaderForm register={register} />
+          <StateHeaderForm
+            register={register}
+            control={control}
+            errors={errors}
+          />
           <SemtTeamForm register={register} control={control} />
           <OngoingProjectsForm register={register} control={control} />
           <KeyDocumentsForm register={register} control={control} />
           <MajorActivitiesForm register={register} control={control} />
           <ProposedActivitiesForm register={register} control={control} />
-
-          <Button variant="contained" size="large" type="submit">
-            Submit Report
+          <Button
+            variant="contained"
+            size="large"
+            type="submit"
+            disabled={loading}
+            startIcon={
+              loading ? <CircularProgress size={18} color="inherit" /> : null
+            }
+          >
+            {loading ? "Submitting..." : "Submit Report"}
           </Button>
         </Stack>
       </form>
