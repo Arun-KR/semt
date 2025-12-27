@@ -1,5 +1,5 @@
-import Report from "../models/Report.js";
-import { reportValidationSchema } from "../validation/reportValidation.js";
+import Report from "../models/report.js";
+import { reportValidationSchema } from "../validation/report-validation.js";
 
 export const submitReport = async (req, res) => {
   try {

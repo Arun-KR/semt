@@ -9,11 +9,16 @@ on:
 jobs:
   build:
     name: Server: Install, Lint & Test
+    permissions: contents-read
     runs-on: ubuntu-latest
+    env:
+      NODE_ENV: test
+      MONGO_URI: ""
 
     defaults:
       run:
-        working-directory: server
+        working-directory: backend
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
@@ -28,7 +33,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: server/package-lock.json
+          cache-dependency-path: backend/package-lock.json
 
       - name: Install server dependencies
         run: npm ci
@@ -36,30 +41,31 @@ jobs:
       - name: Run lint
         run: npm run lint --if-present
 
-      - name: Run tests
+      - name: Run tests (Vitest)
         run: |
-          # Run server tests (if any). If your server test command supports coverage or junit reporters, configure it in package.json.
-          npm test -- --runInBand || true
+          npm test -- --run --coverage
 
       - name: Upload server test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: server-test-results
-          path: server/test-results
+          path: backend/test-results
+          if-no-files-found: ignore
 
       - name: Upload server coverage
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: server-coverage
-          path: server/coverage
+          path: backend/coverage
+          if-no-files-found: ignore
 
       - name: Upload server coverage to Codecov
         if: always()
         uses: codecov/codecov-action@v4
         with:
-          files: server/coverage/**
+          files: backend/coverage/lcov.info
           flags: server
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false

@@ -1,7 +1,7 @@
 import { Card, CardContent, Grid, TextField, Typography } from "@mui/material";
 import { Controller } from "react-hook-form";
 import { Autocomplete } from "@mui/material";
-import { INDIAN_STATES } from "../constants/IndianStates";
+import { INDIAN_STATES } from "../constants/indian-states";
 
 export default function StateHeaderForm({ register, control, errors = {} }) {
   return (
@@ -22,6 +22,7 @@ export default function StateHeaderForm({ register, control, errors = {} }) {
                   options={INDIAN_STATES}
                   value={field.value || null}
                   onChange={(_, value) => field.onChange(value)}
+                  sx={{ minWidth: 250 }}
                   renderInput={(params) => (
                     <TextField
                       {...params}

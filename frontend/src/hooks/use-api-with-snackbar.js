@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import useApi from "./useApi";
-import { useApiSnackbar } from "../context/ApiSnackbarProvider";
+import useApi from "./use-api";
+import { useApiSnackbar } from "../context/api-snackbar-provider";
 
 /**
  * Wrapper around useApi that automatically shows snackbars for errors and

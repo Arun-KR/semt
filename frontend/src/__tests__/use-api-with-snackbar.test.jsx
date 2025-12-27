@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { ApiSnackbarProvider } from "../context/ApiSnackbarProvider";
-import useApiWithSnackbar from "../hooks/useApiWithSnackbar";
+import { ApiSnackbarProvider } from "../context/api-snackbar-provider";
+import useApiWithSnackbar from "../hooks/use-api-with-snackbar";
 import { describe, test, expect } from "vitest";
 function TestComponent() {
   const { post } = useApiWithSnackbar();

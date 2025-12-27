@@ -6,14 +6,14 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
-import useApiWithSnackbar from "../hooks/useApiWithSnackbar";
+import useApiWithSnackbar from "../hooks/use-api-with-snackbar";
 
-import StateHeaderForm from "./StateHeaderForm";
-import SemtTeamForm from "./SemtTeamForm";
-import OngoingProjectsForm from "./OngoingProjectsForm";
-import KeyDocumentsForm from "./KeyDocumentsForm";
-import MajorActivitiesForm from "./MajorActivitiesForm";
-import ProposedActivitiesForm from "./ProposedActivitiesForm";
+import StateHeaderForm from "./state-header-form";
+import SemtTeamForm from "./semt-team-form";
+import OngoingProjectsForm from "./ongoing-projects-form";
+import KeyDocumentsForm from "./key-documents-form";
+import MajorActivitiesForm from "./major-activities-form";
+import ProposedActivitiesForm from "./proposed-activities-form";
 
 export default function StateReportForm() {
   const {
