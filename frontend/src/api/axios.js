@@ -26,6 +26,8 @@ api.interceptors.response.use(
     // Attach original response for callers that still need it
     const normalized = new Error(message);
     normalized.response = error?.response;
+    console.log("Backend URL:", import.meta.env.VITE_API_BASE_URL);
+    console.error("[API Error]", normalized);
     return Promise.reject(normalized);
   }
 );
