@@ -5,6 +5,8 @@ const api = axios.create({
   timeout: 30_000,
 });
 
+console.log("Backend URL:", import.meta.env.VITE_API_BASE_URL);
+
 // Debug logging in development
 if (import.meta.env.DEV) {
   api.interceptors.request.use((config) => {
