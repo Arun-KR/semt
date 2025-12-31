@@ -1,9 +1,18 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
   timeout: 30_000,
 });
+
+// Debug logging in development
+if (import.meta.env.DEV) {
+  api.interceptors.request.use((config) => {
+    console.log("[API Request]", config.method?.toUpperCase(), config.url);
+    console.log("[Body]", config.data);
+    return config;
+  });
+}
 
 // Centralized response interceptor to normalize errors
 api.interceptors.response.use(
