@@ -1,9 +1,14 @@
 import axios from "axios";
 
-// Get backend URL from environment variable
-// In production, VITE_API_BASE_URL must be set
-// In development, fallback to localhost only
+// Get backend URL from runtime config (window.ENV) or build-time env variable
+// In production, VITE_API_BASE_URL must be set either at build time or runtime
 const getBackendURL = () => {
+  // First, try runtime config (injected by Docker at startup)
+  if (window.ENV && window.ENV.VITE_API_BASE_URL) {
+    return window.ENV.VITE_API_BASE_URL;
+  }
+
+  // Fallback to build-time environment variable
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
