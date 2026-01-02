@@ -3,6 +3,6 @@ import { submitReport } from "../controllers/report-controller.js";
 
 const router = express.Router();
 
-router.post("/reports", submitReport);
+router.post("/semt/reports", submitReport);
 
 export default router;

@@ -20,6 +20,8 @@ export const submitReport = async (req, res) => {
       reportId: savedReport._id,
     });
   } catch (error) {
+    console.error("Error in submitReport:", error);
+    
     if (error.name === "ValidationError") {
       return res.status(400).json({
         message: "Validation failed",
@@ -27,9 +29,17 @@ export const submitReport = async (req, res) => {
       });
     }
 
+    // MongoDB connection error
+    if (error.name === "MongooseError" || error.message?.includes("connect")) {
+      return res.status(503).json({
+        message: "Database connection error. Please ensure MongoDB is running.",
+        error: error.message || String(error),
+      });
+    }
+
     res.status(500).json({
       message: "Server error",
-      error: error.message,
+      error: error.message || String(error),
     });
   }
 };

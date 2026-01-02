@@ -1,11 +1,32 @@
 import axios from "axios";
 
+// Get backend URL from environment variable
+// In production, VITE_API_BASE_URL must be set
+// In development, fallback to localhost only
+const getBackendURL = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  // Only allow localhost fallback in development mode
+  if (import.meta.env.DEV) {
+    console.warn(
+      "⚠️ Using localhost fallback. Set VITE_API_BASE_URL in production!"
+    );
+    return "http://localhost:4000";
+  }
+
+  throw new Error(
+    "VITE_API_BASE_URL environment variable is required in production"
+  );
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
+  baseURL: getBackendURL(),
   timeout: 30_000,
 });
 
-console.log("Backend URL:", import.meta.env.VITE_API_BASE_URL);
+console.log("Backend URL:", api.defaults.baseURL);
 
 // Debug logging in development
 if (import.meta.env.DEV) {

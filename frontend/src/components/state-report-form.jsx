@@ -41,7 +41,7 @@ export default function StateReportForm() {
 
   const onSubmit = async (data) => {
     try {
-      await post("/reports", data, { autoSuccess: true });
+      await post("/semt/reports", data, { autoSuccess: true });
       reset();
     } catch (error) {
       console.error("Submit failed:", error);

@@ -1,0 +1,9 @@
+{
+  "stateName": "Kerala",
+  "reportingMonth": "2025-12",
+  "semtTeam": [{ "name": "John", "designation": "Lead" }],
+  "ongoingProjects": [
+    { "projectName": "P1", "currentStage": "Design", "description": "Test" }
+  ],
+  "proposedActivities": ["Activity1"]
+}
