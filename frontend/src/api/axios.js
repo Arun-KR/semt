@@ -1,14 +1,9 @@
 import axios from "axios";
 
-// Get backend URL from runtime config (window.ENV) or build-time env variable
-// In production, VITE_API_BASE_URL must be set either at build time or runtime
+// Get backend URL from environment variable
+// For Azure Static Web Apps, VITE_API_BASE_URL is injected at build time
 const getBackendURL = () => {
-  // First, try runtime config (injected by Docker at startup)
-  if (window.ENV && window.ENV.VITE_API_BASE_URL) {
-    return window.ENV.VITE_API_BASE_URL;
-  }
-
-  // Fallback to build-time environment variable
+  // Use build-time environment variable
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
@@ -22,7 +17,7 @@ const getBackendURL = () => {
   }
 
   throw new Error(
-    "VITE_API_BASE_URL environment variable is required in production"
+    "VITE_API_BASE_URL environment variable is required in production. Set it in GitHub Secrets."
   );
 };
 
