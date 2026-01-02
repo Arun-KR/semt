@@ -16,17 +16,20 @@ const getBackendURL = () => {
     return "http://localhost:4000";
   }
 
-  throw new Error(
-    "VITE_API_BASE_URL environment variable is required in production. Set it in GitHub Secrets."
+  // In production without env var, log error but don't throw to allow page to render
+  console.error(
+    "❌ VITE_API_BASE_URL environment variable is missing! API calls will fail. Set it in GitHub Secrets."
   );
+  return ""; // Return empty string to allow app to load, API calls will fail with clear error
 };
 
+const baseURL = getBackendURL();
 const api = axios.create({
-  baseURL: getBackendURL(),
+  baseURL: baseURL,
   timeout: 30_000,
 });
 
-console.log("Backend URL:", api.defaults.baseURL);
+console.log("Backend URL:", baseURL || "NOT SET");
 
 // Debug logging in development
 if (import.meta.env.DEV) {
